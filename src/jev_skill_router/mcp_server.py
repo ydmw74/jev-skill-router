@@ -24,9 +24,12 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.error import HTTPError, URLError
 
-ADAPTER_URL = (os.environ.get("JEV_SKILL_ADAPTER_URL") or
-               "http://utap.amhomenet.de:3004").rstrip("/")
+ADAPTER_URL = (os.environ.get("JEV_SKILL_ADAPTER_URL") or "").rstrip("/")
 ADAPTER_TOKEN = os.environ.get("JEV_SKILL_ADAPTER_TOKEN", "")
+# Direct mode: your own TypeSafe key, no adapter hop (for standalone setups)
+TYPESAFE_API_KEY = os.environ.get("JEV_TYPESAFE_API_KEY", "")
+TYPESAFE_URL = (os.environ.get("JEV_TYPESAFE_URL")
+                or "https://api.typesafe.ai/v1/systemone")
 SKILLS_ROOT = os.environ.get("HERMES_HOME", os.path.expanduser("~/.hermes")) + "/skills"
 GATE_THRESHOLD = 0.30
 FITS_THRESHOLD = 0.30
@@ -136,17 +139,29 @@ def load_roster() -> list[dict]:
 # ---------------------------------------------------------------- adapter
 
 def call_adapter(document: dict) -> dict:
-    """Ein Pass-Through-Call ans Backend: {state, questions} -> rohe Antwort."""
-    if not ADAPTER_TOKEN:
-        raise RuntimeError("JEV_SKILL_ADAPTER_TOKEN not set")
+    """Ein Call ans Backend: {state, questions} -> rohe Antwort.
+
+    Zwei Modi: Adapter (LAN-Endpoint mit Bearer) oder Direct (eigener
+    TypeSafe-Key). Beide sprechen dasselbe {state, questions}-Format."""
+    url = ADAPTER_URL + "/" if ADAPTER_URL else TYPESAFE_URL
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "jev-skill-router/1.0",
+    }
+    if ADAPTER_URL:
+        if not ADAPTER_TOKEN:
+            raise RuntimeError("JEV_SKILL_ADAPTER_TOKEN not set")
+        headers["Authorization"] = f"Bearer {ADAPTER_TOKEN}"
+    else:
+        if not TYPESAFE_API_KEY:
+            raise RuntimeError(
+                "set JEV_SKILL_ADAPTER_URL + JEV_SKILL_ADAPTER_TOKEN (adapter mode) "
+                "or JEV_TYPESAFE_API_KEY (direct mode)")
+        headers["Authorization"] = f"Bearer {TYPESAFE_API_KEY}"
     req = urllib.request.Request(
-        ADAPTER_URL + "/",
+        url,
         data=json.dumps(document).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {ADAPTER_TOKEN}",
-            "User-Agent": "jev-skill-router/1.0",
-        },
+        headers=headers,
         method="POST",
     )
     try:
@@ -154,9 +169,9 @@ def call_adapter(document: dict) -> dict:
             return json.loads(resp.read().decode("utf-8"))
     except HTTPError as exc:
         err = exc.read().decode("utf-8", "replace")[:200]
-        raise RuntimeError(f"adapter HTTP {exc.code}: {err}") from None
+        raise RuntimeError(f"backend HTTP {exc.code}: {err}") from None
     except URLError as exc:
-        raise RuntimeError(f"adapter unreachable: {exc.reason}") from exc
+        raise RuntimeError(f"backend unreachable: {exc.reason}") from exc
 
 
 # ---------------------------------------------------------------- suggest

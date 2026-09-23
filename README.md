@@ -87,9 +87,10 @@ endpoint that forwards `{state, questions}` to the TypeSafe Decisions API
 hermes mcp test jev-skill-router
 ```
 
-Example results (German paraphrase, zero lexical overlap with the skill
-name): „Schau mal in die Kasse und prüfe den Kontostand" → `n-ahv-kasse`
-(fits 0.96); „Erklär mir was ein Monad ist" → abstain (gate 0.07).
+Example results (paraphrases with zero lexical overlap with the skill name):
+„Bearbeite die Folien meiner Präsentation von letzter Woche" → `powerpoint`
+(fits 0.90); „Was ist eine Cloud-Funktion im Vergleich zu einem Server?" →
+abstain (gate 0.05) — a prose question needs no skill.
 
 ## Notes
 

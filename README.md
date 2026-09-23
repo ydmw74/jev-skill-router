@@ -81,14 +81,22 @@ Hermes discovers the tool on the next session start. Alternatively ask your
 Hermes agent to add the block for you ("add this MCP server to my config")
 — it edits the same YAML.
 
+> **Note on the Agent Plugins v1 package (`hermes plugins install`):** the
+> portable loader does not interpolate `${JEV_TYPESAFE_API_KEY}` in
+> `mcp.json` — it only expands `${PLUGIN_ROOT}`/`${PLUGIN_DATA}`. For the
+> packaged install, `JEV_TYPESAFE_API_KEY` must already be set in the
+> environment the MCP server inherits (Hermes tracks this gap in
+> NousResearch/hermes-agent#120526). The native `mcp_servers` block above
+> does not have this limitation — declare the env there if in doubt.
+
 ### 4. Install the companion skill (recommended)
 
 The skill tells the agent WHEN to call `skill_select` (and that an `abstain`
 is a valid answer). Copy it into your Hermes skills directory:
 
 ```bash
-mkdir -p ~/.hermes/skills/devops/jev-skill-router
-cp skill/SKILL.md ~/.hermes/skills/devops/jev-skill-router/SKILL.md
+mkdir -p ~/.hermes/skills/devops/jev-skill-router-mcp
+cp skill/SKILL.md ~/.hermes/skills/devops/jev-skill-router-mcp/SKILL.md
 ```
 
 ### 5. Verify

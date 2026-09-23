@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "jev-skill-router",
+  "name": "jev-skill-router-mcp",
   "version": "0.1.0",
   "description": "Suggests at most one skill for a request via Jev (TypeSafe cookbook pattern) before the agent loads anything.",
   "author": {

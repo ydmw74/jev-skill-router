@@ -21,7 +21,6 @@ import re
 import sys
 import time
 import urllib.request
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.error import HTTPError, URLError
 
 ADAPTER_URL = (os.environ.get("JEV_SKILL_ADAPTER_URL") or "").rstrip("/")

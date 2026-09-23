@@ -1,12 +1,10 @@
 ---
-name: jev-skill-router
+name: jev-skill-router-mcp
 description: Suggest ONE relevant skill via Jev before loading any.
 version: 0.1.0
 license: MIT
-metadata:
-  hermes:
-    tags: [jev, typesafe, skill-routing, token-saving]
-    related_skills: [jev-mcp-router, typesafe-ai]
+related_skills: [jev-mcp-router, typesafe-ai]
+tags: [jev, typesafe, skill-routing, token-saving]
 ---
 
 # JEV Skill Router

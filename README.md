@@ -49,21 +49,54 @@ mcp__jev_skill_router__skill_select(request: str)
 
 ## Setup
 
-Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/) (or pip).
+### 1. Clone and sync
 
-### Direct mode (standalone — your own TypeSafe key)
+```bash
+git clone https://github.com/ydmw74/jev-skill-router.git
+cd jev-skill-router
+uv sync          # creates .venv; alternatively: pip install -e .
+```
+
+Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/).
+
+### 2. Get a TypeSafe API key
+
+Create one at `console.typesafe.ai/keys` ($5 free credits at signup).
+
+### 3. Register in Hermes
+
+Add to `~/.hermes/config.yaml` (or a profile config) under `mcp_servers`:
 
 ```yaml
   jev-skill-router:
-    command: <uv path>
+    command: <uv path>          # e.g. /Users/you/.local/bin/uv
     args: [run, --project, <path/to/jev-skill-router>, jev-skill-router, mcp]
     env:
-      JEV_TYPESAFE_API_KEY: <your key from console.typesafe.ai>
+      JEV_TYPESAFE_API_KEY: <your key>
     timeout: 60
     enabled: true
 ```
 
-Get a key at `console.typesafe.ai/keys` ($5 free credits at signup).
+Hermes discovers the tool on the next session start. Alternatively ask your
+Hermes agent to add the block for you ("add this MCP server to my config")
+— it edits the same YAML.
+
+### 4. Install the companion skill (recommended)
+
+The skill tells the agent WHEN to call `skill_select` (and that an `abstain`
+is a valid answer). Copy it into your Hermes skills directory:
+
+```bash
+mkdir -p ~/.hermes/skills/devops/jev-skill-router
+cp skill/SKILL.md ~/.hermes/skills/devops/jev-skill-router/SKILL.md
+```
+
+### 5. Verify
+
+```bash
+hermes mcp test jev-skill-router
+```
+
 Cost: ≈ $0.00004 per two-call selection, 0.3–0.9 s latency.
 
 ### Adapter mode (central endpoint, shared key)
@@ -81,16 +114,14 @@ Adapter mode wins when `JEV_SKILL_ADAPTER_URL` is set. Works with any
 endpoint that forwards `{state, questions}` to the TypeSafe Decisions API
 (`api.typesafe.ai/v1/systemone`) and returns the raw answer.
 
-## Verify
+## Example results
 
-```
-hermes mcp test jev-skill-router
-```
+Paraphrases with zero lexical overlap with the skill name:
 
-Example results (paraphrases with zero lexical overlap with the skill name):
-„Bearbeite die Folien meiner Präsentation von letzter Woche" → `powerpoint`
-(fits 0.90); „Was ist eine Cloud-Funktion im Vergleich zu einem Server?" →
-abstain (gate 0.05) — a prose question needs no skill.
+- „Bearbeite die Folien meiner Präsentation von letzter Woche" → `powerpoint`
+  (fits 0.90) — a semantic match the lexical index cannot see
+- „Was ist eine Cloud-Funktion im Vergleich zu einem Server?" → abstain
+  (gate 0.05) — a prose question needs no skill
 
 ## Notes
 

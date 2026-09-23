@@ -61,7 +61,7 @@ Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/).
 
 ### 2. Get a TypeSafe API key
 
-Create one at `console.typesafe.ai/keys` ($5 free credits at signup).
+Create one at `console.typesafe.ai/keys`.
 
 ### 3. Register in Hermes
 
@@ -97,7 +97,8 @@ cp skill/SKILL.md ~/.hermes/skills/devops/jev-skill-router/SKILL.md
 hermes mcp test jev-skill-router
 ```
 
-Cost: ≈ $0.00004 per two-call selection, 0.3–0.9 s latency.
+Cost: see current TypeSafe pricing; each selection is two small Decisions
+calls. Latency: 0.3–0.9 s per selection.
 
 ### Adapter mode (central endpoint, shared key)
 

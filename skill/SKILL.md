@@ -58,4 +58,4 @@ result carries:
   Präsentation" -> powerpoint).
 - Before EVERY skill load in fresh sessions when unsure which skill fits.
 - NOT for trivial requests (greetings, simple questions) — the Jev gate
-  abstains on prose-only turns (~$0.00002 per abstained check).
+  abstains on prose-only turns.
